@@ -4,14 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HIGHCLASS TRACKING</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
         :root {
             --bg-color: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.9);
+            --card-bg: rgba(30, 41, 59, 0.95);
             --gold-primary: #d4af37;
             --text-main: #ffffff;
+            --text-muted: #94a3b8;
         }
         body {
             background-color: var(--bg-color);
@@ -25,8 +28,8 @@
             flex-direction: column;
             align-items: center;
         }
-        h1 { font-family: 'Playfair Display', serif; color: var(--gold-primary); margin-bottom: 5px; }
-        .subtitle { color: #94a3b8; font-size: 0.9em; margin-bottom: 30px; }
+        h1 { font-family: 'Playfair Display', serif; color: var(--gold-primary); margin-bottom: 5px; font-size: 2.2em; }
+        .subtitle { color: var(--text-muted); font-size: 0.9em; margin-bottom: 30px; letter-spacing: 1px; }
         
         .container { width: 100%; max-width: 500px; }
         .card {
@@ -47,7 +50,10 @@
             color: white;
             font-family: 'Prompt', sans-serif;
             box-sizing: border-box;
+            font-size: 1em;
         }
+        input:focus { outline: none; border-color: var(--gold-primary); }
+
         button {
             width: 100%;
             padding: 12px;
@@ -59,16 +65,57 @@
             cursor: pointer;
             font-family: 'Prompt', sans-serif;
             margin-top: 10px;
+            font-size: 1em;
+            transition: 0.3s;
         }
-        .result-item { border-bottom: 1px solid rgba(255,255,255,0.1); padding: 15px 0; }
-        .highlight { color: var(--gold-primary); font-size: 1.2em; font-weight: bold; }
-        .track-btn {
-            display: inline-block; margin-top: 10px; padding: 5px 15px;
-            border: 1px solid var(--gold-primary); color: var(--gold-primary);
-            text-decoration: none; border-radius: 20px; font-size: 0.8em;
+        button:hover { background: linear-gradient(135deg, #d4af37, #f3e5ab); }
+
+        .result-item { 
+            border-bottom: 1px solid rgba(255,255,255,0.1); 
+            padding: 12px 0; 
+            display: flex; 
+            justify-content: space-between;
         }
+        .result-item:last-child { border-bottom: none; }
+        
+        .label { color: var(--text-muted); font-size: 0.9em; }
+        .value { font-weight: 500; text-align: right; }
+
+        .highlight { color: var(--gold-primary); font-size: 1.2em; font-weight: bold; font-family: 'Playfair Display', serif; }
+        
+        /* --- ปุ่ม Timeline แบบใหม่ (Popup) --- */
+        .timeline-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            margin-top: 15px;
+            padding: 12px 0;
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid var(--gold-primary);
+            color: var(--gold-primary);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+        .timeline-btn:hover {
+            background: var(--gold-primary);
+            color: #0f172a;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+        .timeline-btn i { margin-right: 8px; }
+
         #loader { display: none; text-align: center; color: var(--gold-primary); margin-top: 10px; }
         .hidden { display: none; }
+        
+        .admin-link {
+            text-align: center; margin-top: 20px; font-size: 0.8em; 
+            color: #475569; cursor: pointer; transition: 0.3s;
+        }
+        .admin-link:hover { color: var(--gold-primary); }
     </style>
 </head>
 <body>
@@ -80,14 +127,16 @@
         <div id="userPanel" class="card">
             <h3>ตรวจสอบสถานะ</h3>
             <input type="text" id="searchInput" placeholder="กรอกชื่อจริงของคุณ...">
-            <button onclick="searchData()">ค้นหาพัสดุ</button>
-            <div id="loader">⏳ กำลังค้นหาข้อมูล...</div>
+            <button onclick="searchData()">
+                <i class="fas fa-search"></i> ค้นหาพัสดุ
+            </button>
+            <div id="loader"><i class="fas fa-circle-notch fa-spin"></i> กำลังค้นหาข้อมูล...</div>
         </div>
         
         <div id="resultArea"></div>
 
-        <div style="text-align: center; margin-top: 20px; font-size: 0.8em; color: #475569; cursor: pointer;" onclick="toggleAdmin()">
-            Admin Login
+        <div class="admin-link" onclick="toggleAdmin()">
+            <i class="fas fa-user-shield"></i> Admin Login
         </div>
 
         <div id="loginPanel" class="card hidden">
@@ -97,17 +146,20 @@
         </div>
 
         <div id="adminWorkPanel" class="card hidden">
-            <h3>จัดการพัสดุ</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="margin:0;">จัดการพัสดุ</h3>
+                <button onclick="location.reload()" style="width:auto; padding:5px 10px; margin:0; background:transparent; border:1px solid #ef4444; color:#ef4444; font-size:0.7em;">ออกจากระบบ</button>
+            </div>
+            
             <input type="text" id="addName" placeholder="ชื่อลูกค้า">
             <input type="text" id="addTrack" placeholder="เลขพัสดุ">
             <input type="text" id="addProd" placeholder="สินค้า">
-            <button onclick="addData()">บันทึก</button>
-            <button onclick="location.reload()" style="background: transparent; border: 1px solid #64748b; color: #94a3b8;">ออกจากระบบ</button>
+            <button onclick="addData()">บันทึกข้อมูล</button>
         </div>
     </div>
 
     <script>
-        // 👇 ใส่ URL ล่าสุดที่ได้จากการ Deploy เมื่อกี้ 👇
+        // 👇 URL ที่พี่ให้มาล่าสุด 👇
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzxZML_y9IV1FVwQMpVaJ8j-CoIiTgS2M1evFMIbkfppDkmkkxXEK3PM2Met5axipYFeg/exec"; 
 
         function searchData() {
@@ -117,13 +169,9 @@
             document.getElementById('loader').style.display = 'block';
             document.getElementById('resultArea').innerHTML = "";
 
-            // เปลี่ยนวิธีดึงข้อมูล เป็นแบบ text() เพื่อความชัวร์
-            fetch(`${GOOGLE_SCRIPT_URL}?action=search&name=${name}`, {
-                method: "GET",
-            })
-            .then(response => response.text()) // <--- อ่านเป็น Text ก่อน (Instagram ชอบแบบนี้)
+            fetch(`${GOOGLE_SCRIPT_URL}?action=search&name=${name}`, { method: "GET" })
+            .then(response => response.text())
             .then(text => {
-                // แปลง Text กลับเป็น JSON เอง
                 const data = JSON.parse(text); 
                 document.getElementById('loader').style.display = 'none';
                 displayResults(data.data);
@@ -131,25 +179,36 @@
             .catch(error => {
                 document.getElementById('loader').style.display = 'none';
                 alert("ไม่สามารถเชื่อมต่อได้: " + error);
-                console.error(error);
             });
         }
 
         function displayResults(data) {
             let html = "";
             if (!data || data.length === 0) {
-                html = '<div class="card" style="text-align:center; color:#ff6b6b;">ไม่พบข้อมูลพัสดุ</div>';
+                html = '<div class="card" style="text-align:center; color:#ff6b6b;"><i class="fas fa-exclamation-circle"></i> ไม่พบข้อมูลพัสดุ</div>';
             } else {
                 data.forEach(item => {
-                    let flashLink = "https://www.flashexpress.co.th/tracking/?se=" + item.tracking;
                     html += `
                         <div class="card">
-                            <div class="result-item">ลูกค้า: ${item.name}</div>
-                            <div class="result-item">สินค้า: ${item.product}</div>
                             <div class="result-item">
-                                Tracking: <span class="highlight">${item.tracking}</span>
-                                <br>
-                                <a href="${flashLink}" target="_blank" class="track-btn">📦 เช็คสถานะ Flash</a>
+                                <span class="label">ลูกค้า</span>
+                                <span class="value">${item.name}</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="label">สินค้า</span>
+                                <span class="value">${item.product}</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="label">Tracking</span>
+                                <span class="value highlight">${item.tracking}</span>
+                            </div>
+                            
+                            <div onclick="openTimelinePopup('${item.tracking}')" class="timeline-btn">
+                                <i class="fas fa-shipping-fast"></i> ดูไทม์ไลน์ละเอียด (Real-time)
+                            </div>
+                            
+                            <div style="text-align:center; margin-top:10px;">
+                                <span class="label" style="font-size:0.7em;">อัปเดตเมื่อ: ${item.date}</span>
                             </div>
                         </div>`;
                 });
@@ -157,15 +216,37 @@
             document.getElementById('resultArea').innerHTML = html;
         }
 
+        // --- ฟังก์ชันเปิด Popup Timeline (ไฮไลท์ใหม่) ---
+        function openTimelinePopup(trackingNumber) {
+            const url = 'https://www.flashexpress.co.th/tracking/?se=' + trackingNumber;
+            
+            // เช็คว่าเป็น In-App Browser (IG/Line) หรือไม่
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            const isInApp = (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Instagram") > -1) || (ua.indexOf("Line") > -1);
+
+            if (isInApp) {
+                // ถ้าเป็น IG/Line ให้ Redirect ปกติ (กัน Error)
+                window.location.href = url;
+            } else {
+                // ถ้าเป็น Chrome/Safari ให้เปิด Popup สวยๆ
+                const width = 420;
+                const height = 700;
+                const left = (window.screen.width - width) / 2;
+                const top = (window.screen.height - height) / 2;
+                window.open(url, 'TrackingTimeline', `width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`);
+            }
+        }
+
         function toggleAdmin() {
             document.getElementById('loginPanel').classList.toggle('hidden');
             document.getElementById('userPanel').classList.toggle('hidden');
+            document.getElementById('resultArea').innerHTML = "";
         }
 
         function doLogin() {
             let pass = document.getElementById('adminPass').value;
             fetch(`${GOOGLE_SCRIPT_URL}?action=login&pass=${pass}`)
-                .then(res => res.text()) // <--- แก้ตรงนี้ด้วย
+                .then(res => res.text())
                 .then(text => {
                     const data = JSON.parse(text);
                     if(data.status == 'success') {
@@ -184,7 +265,7 @@
             let pass = document.getElementById('adminPass').value;
             
             fetch(`${GOOGLE_SCRIPT_URL}?action=add&name=${n}&track=${t}&prod=${p}&pass=${pass}`)
-                .then(res => res.text()) // <--- แก้ตรงนี้ด้วย
+                .then(res => res.text())
                 .then(text => {
                    const data = JSON.parse(text);
                    alert(data.msg);
