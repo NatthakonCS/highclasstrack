@@ -20,51 +20,5 @@
 <body>
     <iframe src="https://script.google.com/macros/s/AKfycbySkafguJe-7SV7-AcQpuUAfJ8cpp0VSY1_jJIwDyjpQeWt8X2hbtgeoS8MyltNFcN2uw/exec"></iframe>
     <script>
-  // ฟังก์ชันตรวจสอบว่าเปิดผ่าน Instagram / Facebook / LINE หรือไม่
-  function isInAppBrowser() {
-    var ua = navigator.userAgent || navigator.vendor || window.opera;
-    // ตรวจสอบคำสำคัญใน User Agent ของเบราว์เซอร์
-    return (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Instagram") > -1) || (ua.indexOf("Line") > -1);
-  }
-
-  // ถ้าใช่ ให้สร้างหน้าต่างแจ้งเตือนทับหน้าจอ
-  if (isInAppBrowser()) {
-    var overlay = document.createElement('div');
-    // ตกแต่งให้เข้ากับธีม Highclass (ดำ-ทอง)
-    overlay.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: #0f172a;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      color: #d4af37;
-      font-family: 'Prompt', sans-serif;
-      padding: 20px;
-    `;
-
-    overlay.innerHTML = `
-      <h1 style="font-size: 3em; margin-bottom: 20px;">⚠️</h1>
-      <h2 style="color: #ffffff;">กรุณาเปิดในเบราว์เซอร์หลัก</h2>
-      <p style="color: #94a3b8; margin-bottom: 30px;">
-        Instagram/Facebook ไม่รองรับระบบความปลอดภัยขั้นสูงของ Google<br>
-        กรุณาทำตามขั้นตอนด้านล่างเพื่อใช้งาน
-      </p>
-      
-      <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; border: 1px solid #d4af37; max-width: 80%;">
-        <p style="margin: 10px 0; color: white;">1. กดที่จุด 3 จุด มุมขวาบน ( <span style="font-size:1.5em; vertical-align:middle;">...</span> )</p>
-        <p style="margin: 10px 0; color: white;">2. เลือก <strong>"Open in external browser"</strong><br>(หรือ "เปิดในเบราว์เซอร์")</p>
-      </div>
-    `;
-    
-    document.body.appendChild(overlay);
-  }
-</script>
 </body>
 </html>
