@@ -3,142 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>High Class Tracking | ตรวจสอบพัสดุ</title>
-    
-    <meta property="og:title" content="High Class Tracking">
-    <meta property="og:description" content="ระบบตรวจสอบสถานะพัสดุสำหรับลูกค้าคนพิเศษ">
-    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/2983/2983838.png">
-
+    <title>HIGHCLASS TRACKING</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
+    
     <style>
         :root {
             --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.9);
             --gold-primary: #d4af37;
             --text-main: #ffffff;
         }
-
         body {
-            margin: 0;
-            padding: 0;
             background-color: var(--bg-color);
             background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 70%);
-            color: var(--text-main);
             font-family: 'Prompt', sans-serif;
-            height: 100vh;
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            text-align: center;
-            overflow: hidden;
         }
-
-        .container {
-            padding: 20px;
-            width: 90%;
-            max-width: 400px;
-            animation: fadeIn 1.5s ease;
+        h1 { font-family: 'Playfair Display', serif; color: var(--gold-primary); margin-bottom: 5px; }
+        .subtitle { color: #94a3b8; font-size: 0.9em; margin-bottom: 30px; }
+        
+        .container { width: 100%; max-width: 500px; }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
         }
-
-        h1 {
-            font-family: 'Playfair Display', serif;
-            color: var(--gold-primary);
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
-        }
-
-        p {
-            color: #94a3b8;
-            margin-bottom: 40px;
-            font-weight: 300;
-        }
-
-        .enter-btn {
-            display: block;
+        input {
             width: 100%;
-            padding: 15px 0;
+            padding: 12px;
+            margin: 10px 0;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: white;
+            font-family: 'Prompt', sans-serif;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
             background: linear-gradient(135deg, #b8860b, #d4af37);
-            color: #0f172a;
-            font-size: 1.1em;
-            font-weight: 600;
             border: none;
-            border-radius: 50px;
-            text-decoration: none;
-            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
-            transition: all 0.3s;
+            border-radius: 8px;
+            color: #0f172a;
+            font-weight: 600;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
+            font-family: 'Prompt', sans-serif;
+            margin-top: 10px;
         }
-
-        .enter-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.5);
-            background: linear-gradient(135deg, #d4af37, #f3e5ab);
+        .result-item { border-bottom: 1px solid rgba(255,255,255,0.1); padding: 15px 0; }
+        .highlight { color: var(--gold-primary); font-size: 1.2em; font-weight: bold; }
+        .track-btn {
+            display: inline-block; margin-top: 10px; padding: 5px 15px;
+            border: 1px solid var(--gold-primary); color: var(--gold-primary);
+            text-decoration: none; border-radius: 20px; font-size: 0.8em;
         }
-
-        .footer {
-            margin-top: 50px;
-            font-size: 0.8em;
-            color: #475569;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* โหลดเดอร์หมุนๆ */
-        .spinner {
-            display: none;
-            margin: 20px auto;
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(212, 175, 55, 0.3);
-            border-top: 4px solid var(--gold-primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #loader { display: none; text-align: center; color: var(--gold-primary); margin-top: 10px; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
+    <h1>MAAYOUNG</h1>
+    <div class="subtitle">ระบบตรวจสอบพัสดุ High Class</div>
+
     <div class="container">
-        <i class="fas fa-box-open" style="font-size: 4em; color: var(--gold-primary); margin-bottom: 20px;"></i>
+        <div id="userPanel" class="card">
+            <h3>ตรวจสอบสถานะ</h3>
+            <input type="text" id="searchInput" placeholder="กรอกชื่อจริงของคุณ...">
+            <button onclick="searchData()">ค้นหาพัสดุ</button>
+            <div id="loader">⏳ กำลังค้นหาข้อมูล...</div>
+        </div>
         
-        <h1>MAAYOUNG</h1>
-        <p>ระบบตรวจสอบสถานะพัสดุ<br>High Class Service</p>
+        <div id="resultArea"></div>
 
-        <a id="enterLink" href="https://script.google.com/macros/s/AKfycbySkafguJe-7SV7-AcQpuUAfJ8cpp0VSY1_jJIwDyjpQeWt8X2hbtgeoS8MyltNFcN2uw/exec" class="enter-btn">
-            เข้าสู่ระบบตรวจสอบ
-        </a>
+        <div style="text-align: center; margin-top: 20px; font-size: 0.8em; color: #475569; cursor: pointer;" onclick="toggleAdmin()">
+            Admin Login
+        </div>
 
-        <div id="loader" class="spinner"></div>
+        <div id="loginPanel" class="card hidden">
+            <h3>Admin Login</h3>
+            <input type="password" id="adminPass" placeholder="รหัสผ่าน">
+            <button onclick="doLogin()">เข้าสู่ระบบ</button>
+        </div>
 
-        <div class="footer">
-            Powered by Google Cloud
+        <div id="adminWorkPanel" class="card hidden">
+            <h3>จัดการพัสดุ</h3>
+            <input type="text" id="addName" placeholder="ชื่อลูกค้า">
+            <input type="text" id="addTrack" placeholder="เลขพัสดุ">
+            <input type="text" id="addProd" placeholder="สินค้า">
+            <button onclick="addData()">บันทึก</button>
+            <button onclick="location.reload()" style="background: transparent; border: 1px solid #64748b; color: #94a3b8;">ออกจากระบบ</button>
         </div>
     </div>
 
     <script>
-        // เพิ่มลูกเล่น: พอกดแล้วให้ปุ่มเปลี่ยนเป็นโหลดเดอร์
-        document.getElementById('enterLink').addEventListener('click', function(e) {
-            // โค้ดนี้ช่วยให้เปิดในเบราว์เซอร์ใหม่ ถ้าเปิดใน IG
-            var isIG = navigator.userAgent.includes("Instagram");
-            if (isIG) {
-                // ถ้าเป็น IG ไม่ต้องทำอะไรพิเศษ ให้มันวิ่งไปตามลิงก์ href ปกติ
-                // แต่ถ้าอยากบังคับจริงๆ อาจใช้ window.location.href แทน
-            }
-            
-            this.style.display = 'none';
-            document.getElementById('loader').style.display = 'block';
-        });
-    </script>
+        // 👇👇 ใส่ URL Web App อันใหม่ ตรงนี้! 👇👇
+        const GOOGLE_SCRIPT_URL = "https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjWP2r0nprZq9StpJRsHDj6_opoG-QtQxqMuvy-CvrCQA72cuXQLcpo23UIWsQytklOGO042qJWbleRrkj5CssF1Zpi3vmd_7q_4ir55oqiGjDZ10Sl5ihXWVomY1tmWieOZed3ZDSRKXIkb4dkD6bZUfnAeoOez6fOEDNGd6ZCOGbQueSG46PCnz_TfhKFj24zLiLF3G5iJsnfa0i_mF7jKh8Bw8dxpP0ZWfonVPOTAnfCM8XOUcLjpA3yiDGiT9od-C9zO5U1-QY01amPsbCVJpJwDDX8G7jKOygl&lib=Mx55T-qhsQxbgo7TyGYIQ1FK0aO8KHYqh"; 
 
+        function searchData() {
+            let name = document.getElementById('searchInput').value;
+            if(!name) return alert("กรุณากรอกชื่อ");
+            
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('resultArea').innerHTML = "";
+
+            fetch(`${GOOGLE_SCRIPT_URL}?action=search&name=${name}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('loader').style.display = 'none';
+                    displayResults(data.data);
+                })
+                .catch(error => {
+                    document.getElementById('loader').style.display = 'none';
+                    alert("เกิดข้อผิดพลาดในการเชื่อมต่อ");
+                });
+        }
+
+        function displayResults(data) {
+            let html = "";
+            if (!data || data.length === 0) {
+                html = '<div class="card" style="text-align:center; color:#ff6b6b;">ไม่พบข้อมูลพัสดุ</div>';
+            } else {
+                data.forEach(item => {
+                    let flashLink = "https://www.flashexpress.co.th/tracking/?se=" + item.tracking;
+                    html += `
+                        <div class="card">
+                            <div class="result-item">ลูกค้า: ${item.name}</div>
+                            <div class="result-item">สินค้า: ${item.product}</div>
+                            <div class="result-item">
+                                Tracking: <span class="highlight">${item.tracking}</span>
+                                <br>
+                                <a href="${flashLink}" target="_blank" class="track-btn">📦 เช็คสถานะ Flash</a>
+                            </div>
+                        </div>`;
+                });
+            }
+            document.getElementById('resultArea').innerHTML = html;
+        }
+
+        // --- Admin Functions ---
+        function toggleAdmin() {
+            document.getElementById('loginPanel').classList.toggle('hidden');
+            document.getElementById('userPanel').classList.toggle('hidden');
+        }
+
+        function doLogin() {
+            let pass = document.getElementById('adminPass').value;
+            fetch(`${GOOGLE_SCRIPT_URL}?action=login&pass=${pass}`)
+                .then(res => res.json())
+                .then(data => {
+                    if(data.status == 'success') {
+                        document.getElementById('loginPanel').classList.add('hidden');
+                        document.getElementById('adminWorkPanel').classList.remove('hidden');
+                    } else {
+                        alert("รหัสผิด");
+                    }
+                });
+        }
+
+        function addData() {
+            let n = document.getElementById('addName').value;
+            let t = document.getElementById('addTrack').value;
+            let p = document.getElementById('addProd').value;
+            
+            fetch(`${GOOGLE_SCRIPT_URL}?action=add&name=${n}&track=${t}&prod=${p}`)
+                .then(res => res.json())
+                .then(data => alert(data.msg));
+        }
+    </script>
 </body>
 </html>
