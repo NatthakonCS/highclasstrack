@@ -175,10 +175,23 @@
             let n = document.getElementById('addName').value;
             let t = document.getElementById('addTrack').value;
             let p = document.getElementById('addProd').value;
+            // ดึงรหัสผ่านจากช่อง Login ที่เรากรอกค้างไว้
+            let pass = document.getElementById('adminPass').value; 
             
-            fetch(`${GOOGLE_SCRIPT_URL}?action=add&name=${n}&track=${t}&prod=${p}`)
+            // ส่งรหัสผ่าน (pass) ไปด้วย เพื่อยืนยันว่าเป็นตัวจริง
+            fetch(`${GOOGLE_SCRIPT_URL}?action=add&name=${n}&track=${t}&prod=${p}&pass=${pass}`)
                 .then(res => res.json())
-                .then(data => alert(data.msg));
+                .then(data => {
+                    if(data.status == 'success') {
+                        alert(data.msg);
+                        // เคลียร์ช่อง
+                        document.getElementById('addName').value = "";
+                        document.getElementById('addTrack').value = "";
+                        document.getElementById('addProd').value = "";
+                    } else {
+                        alert(data.msg); // จะขึ้นเตือนถ้าใครแอบยิง API มั่วๆ
+                    }
+                });
         }
     </script>
 </body>
