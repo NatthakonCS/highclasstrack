@@ -83,7 +83,6 @@
 
         .highlight { color: var(--gold-primary); font-size: 1.2em; font-weight: bold; font-family: 'Playfair Display', serif; }
         
-        /* --- ปุ่ม Timeline แบบใหม่ (Popup) --- */
         .timeline-btn {
             display: flex;
             justify-content: center;
@@ -126,7 +125,7 @@
     <div class="container">
         <div id="userPanel" class="card">
             <h3>ตรวจสอบสถานะ</h3>
-            <input type="text" id="searchInput" placeholder="กรอกชื่อจริงของคุณ...">
+            <input type="text" id="searchInput" placeholder="กรอกชื่อจริงของคุณ..." onkeypress="handleEnter(event)">
             <button onclick="searchData()">
                 <i class="fas fa-search"></i> ค้นหาพัสดุ
             </button>
@@ -141,7 +140,7 @@
 
         <div id="loginPanel" class="card hidden">
             <h3>Admin Login</h3>
-            <input type="password" id="adminPass" placeholder="รหัสผ่าน">
+            <input type="password" id="adminPass" placeholder="รหัสผ่าน" onkeypress="handleAdminEnter(event)">
             <button onclick="doLogin()">เข้าสู่ระบบ</button>
         </div>
 
@@ -159,8 +158,17 @@
     </div>
 
     <script>
-        // URL ของ Google Script 
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzxZML_y9IV1FVwQMpVaJ8j-CoIiTgS2M1evFMIbkfppDkmkkxXEK3PM2Met5axipYFeg/exec"; 
+
+        // ฟังก์ชันช่วยกด Enter เพื่อค้นหา
+        function handleEnter(e) {
+            if (e.key === 'Enter') searchData();
+        }
+        
+        // ฟังก์ชันช่วยกด Enter ตอนล็อคอิน
+        function handleAdminEnter(e) {
+            if (e.key === 'Enter') doLogin();
+        }
 
         function searchData() {
             let name = document.getElementById('searchInput').value;
@@ -216,32 +224,50 @@
             document.getElementById('resultArea').innerHTML = html;
         }
 
-        // --- อัปเดตฟังก์ชันเปิด Popup รองรับไปรษณีย์ไทย ---
+        // --- ระบบเปิดดูไทม์ไลน์ และ Auto-Copy ---
         function openTimelinePopup(trackingNumber) {
             let url = '';
-            // ตัดช่องว่างหน้า-หลังและทำให้เป็นตัวพิมพ์ใหญ่ทั้งหมด
             let tracking = trackingNumber.trim().toUpperCase(); 
             
-            // เช็ครูปแบบไปรษณีย์ไทย: ตัวอักษร 2 ตัว + ตัวเลข 9 ตัว + จบด้วย TH (เช่น ED123456789TH)
+            // ตรวจสอบเบราว์เซอร์ภายในแอป
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            const isInApp = (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Instagram") > -1) || (ua.indexOf("Line") > -1);
+            
+            // รูปแบบไปรษณีย์ไทย (อักษร 2 ตัว + เลข 9 ตัว + TH)
             const thaiPostRegex = /^[A-Z]{2}\d{9}TH$/;
 
             if (thaiPostRegex.test(tracking)) {
-                // ถ้าเป็นไปรษณีย์ไทย วิ่งไปเช็คผ่าน ParcelsApp
-                url = 'https://parcelsapp.com/th/tracking/' + tracking;
-            } else {
-                // ถ้าไม่ใช่ ให้ถือว่าเป็น Flash Express แบบเดิม
-                url = 'https://www.flashexpress.co.th/tracking/?se=' + tracking;
-            }
-            
-            // เช็คว่าเป็น In-App Browser (IG/Line/FB) หรือไม่
-            const ua = navigator.userAgent || navigator.vendor || window.opera;
-            const isInApp = (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Instagram") > -1) || (ua.indexOf("Line") > -1);
+                // ระบบ Auto-Copy เลขพัสดุ
+                const el = document.createElement('textarea');
+                el.value = tracking;
+                document.body.appendChild(el);
+                el.select();
+                try {
+                    document.execCommand('copy');
+                    alert('คัดลอกเลขพัสดุ: ' + tracking + ' เรียบร้อย! 📦\n\nระบบกำลังพาไปเว็บไปรษณีย์ไทย ให้คุณกด "วาง" (Paste) ในช่องค้นหาได้เลยครับ');
+                } catch (e) {
+                    // หากเว็บบราวเซอร์ลูกค้าไม่อนุญาตให้ก็อปปี้อัตโนมัติ
+                    alert('กรุณาคัดลอกเลขพัสดุนี้: ' + tracking + ' เพื่อไปวางในเว็บไปรษณีย์ไทยครับ');
+                }
+                document.body.removeChild(el);
 
+                url = 'https://track.thailandpost.co.th/';
+                
+                // สั่งเปิดหน้าเว็บ ปณ.ไทย
+                if (isInApp) {
+                    window.location.href = url;
+                } else {
+                    window.open(url, '_blank');
+                }
+                return; // จบการทำงานตรงนี้ ไม่ลงไปรันของ Flash
+            }
+
+            // ถ้าไม่ใช่ไปรษณีย์ไทย ให้เข้าหน้า Flash Express แบบระบุ URL อัตโนมัติ
+            url = 'https://www.flashexpress.co.th/tracking/?se=' + tracking;
+            
             if (isInApp) {
-                // ถ้าเป็น IG/Line ให้ Redirect ปกติ (กัน Error)
                 window.location.href = url;
             } else {
-                // ถ้าเป็น Chrome/Safari ให้เปิด Popup
                 const width = 420;
                 const height = 700;
                 const left = (window.screen.width - width) / 2;
