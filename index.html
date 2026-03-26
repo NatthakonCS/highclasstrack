@@ -159,7 +159,7 @@
     </div>
 
     <script>
-        // 👇 URL ที่พี่ให้มาล่าสุด 👇
+        // URL ของ Google Script 
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzxZML_y9IV1FVwQMpVaJ8j-CoIiTgS2M1evFMIbkfppDkmkkxXEK3PM2Met5axipYFeg/exec"; 
 
         function searchData() {
@@ -216,11 +216,24 @@
             document.getElementById('resultArea').innerHTML = html;
         }
 
-        // --- ฟังก์ชันเปิด Popup Timeline (ไฮไลท์ใหม่) ---
+        // --- อัปเดตฟังก์ชันเปิด Popup รองรับไปรษณีย์ไทย ---
         function openTimelinePopup(trackingNumber) {
-            const url = 'https://www.flashexpress.co.th/tracking/?se=' + trackingNumber;
+            let url = '';
+            // ตัดช่องว่างหน้า-หลังและทำให้เป็นตัวพิมพ์ใหญ่ทั้งหมด
+            let tracking = trackingNumber.trim().toUpperCase(); 
             
-            // เช็คว่าเป็น In-App Browser (IG/Line) หรือไม่
+            // เช็ครูปแบบไปรษณีย์ไทย: ตัวอักษร 2 ตัว + ตัวเลข 9 ตัว + จบด้วย TH (เช่น ED123456789TH)
+            const thaiPostRegex = /^[A-Z]{2}\d{9}TH$/;
+
+            if (thaiPostRegex.test(tracking)) {
+                // ถ้าเป็นไปรษณีย์ไทย วิ่งไปเช็คผ่าน ParcelsApp
+                url = 'https://parcelsapp.com/th/tracking/' + tracking;
+            } else {
+                // ถ้าไม่ใช่ ให้ถือว่าเป็น Flash Express แบบเดิม
+                url = 'https://www.flashexpress.co.th/tracking/?se=' + tracking;
+            }
+            
+            // เช็คว่าเป็น In-App Browser (IG/Line/FB) หรือไม่
             const ua = navigator.userAgent || navigator.vendor || window.opera;
             const isInApp = (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Instagram") > -1) || (ua.indexOf("Line") > -1);
 
@@ -228,7 +241,7 @@
                 // ถ้าเป็น IG/Line ให้ Redirect ปกติ (กัน Error)
                 window.location.href = url;
             } else {
-                // ถ้าเป็น Chrome/Safari ให้เปิด Popup สวยๆ
+                // ถ้าเป็น Chrome/Safari ให้เปิด Popup
                 const width = 420;
                 const height = 700;
                 const left = (window.screen.width - width) / 2;
